@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "833241996678",
+    "firebase_url": "https://dabbashop-5eddb-default-rtdb.firebaseio.com",
+    "project_id": "dabbashop-5eddb",
+    "storage_bucket": "dabbashop-5eddb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833241996678:android:b49920392f9de06ed22007",
+        "android_client_info": {
+          "package_name": "com.example.dabba_chat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVzOrf_fY14wNDpAgaeQqW2bDcLWbGS3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
