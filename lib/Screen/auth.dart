@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../widget/user_image.dart';
 
 final firebaseAuth=FirebaseAuth.instance;
 class Auth extends StatefulWidget{
@@ -14,9 +19,13 @@ class _AuthState extends State<Auth>{
 var email=TextEditingController();
 var pass=TextEditingController();
 var isLogin=false;
+File ?selectedImage;
+
   void _submit() async {
     final _isValid = _form.currentState!.validate();
-    if (!_isValid) return;
+    if (!_isValid||selectedImage==null||!isLogin) {
+      return;
+    }
 
     _form.currentState!.save();
 
@@ -65,7 +74,12 @@ var isLogin=false;
           email: email.text.trim(),
           password: pass.text.trim(),
         );
-
+        ///Store in firebase storage and download it...start
+// final storageRef=FirebaseStorage.instance.ref().child('User_Images').child('${userCred.user!.uid}.jpg');
+// await storageRef.putFile(selectedImage!);
+//         final getImage=await storageRef.getDownloadURL();
+//         print("getImage...${getImage}");
+        ///Store in firebase storage and download it...end
         final user = userCred.user;
 
         if (user != null) {
@@ -133,6 +147,9 @@ key: _form,
                child: Column(
                  mainAxisSize: MainAxisSize.min,
                  children: [
+                   if(!isLogin)UserImage(onpickedImage:(pickedImage){
+                     selectedImage=pickedImage;
+                   } ,),
                  TextFormField(
                    validator:(value){
                      if(value==null||value.isEmpty||!value.contains("@")){
@@ -150,7 +167,6 @@ key: _form,
                    textCapitalization: TextCapitalization.none,
                    onSaved: (value){
                      email.text=value!;
-
                    },
                  ),
                    TextFormField(

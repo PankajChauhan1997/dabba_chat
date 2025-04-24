@@ -10,7 +10,7 @@ class ChatScreen extends StatelessWidget {
       appBar: AppBar(title: Text("Dabba Chit-Chat"),
         actions: [
           InkWell(child:
-          Icon(Icons.logout),
+          Icon(Icons.exit_to_app,color: Theme.of(context).colorScheme.primary,),
       onTap: (){
             FirebaseAuth.instance.signOut();
       },
