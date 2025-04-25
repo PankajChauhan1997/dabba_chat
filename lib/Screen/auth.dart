@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:path_provider/path_provider.dart';
 import '../widget/user_image.dart';
-
+import 'package:image/image.dart' as img;
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
@@ -19,6 +22,8 @@ class _AuthScreenState extends State<AuthScreen> {
   var _isLogin = true;
   var _isAuthenticating = false;
   File? _selectedImage;
+  String? _imageBase64;
+  final _firestore = FirebaseFirestore.instance;
 
   @override
   void dispose() {
@@ -26,7 +31,20 @@ class _AuthScreenState extends State<AuthScreen> {
     _passwordController.dispose();
     super.dispose();
   }
+  Future<File> _compressImage(File file) async {
+    try {
+      final image = img.decodeImage(await file.readAsBytes())!;
+      final smallerImage = img.copyResize(image, width: 300);
+      final compressedBytes = img.encodeJpg(smallerImage, quality: 85);
 
+      final tempDir = await getTemporaryDirectory();
+      final path = '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      return File(path).writeAsBytes(compressedBytes);
+    } catch (e) {
+      debugPrint('Image compression failed: $e');
+      return file;
+    }
+  }
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -50,7 +68,24 @@ class _AuthScreenState extends State<AuthScreen> {
           if (!mounted) return;
           _showEmailNotVerifiedDialog();
           return;
+        }else if(userCredential.user?.emailVerified == true){
+          // Step 2: Process image if selected
+          if (_selectedImage != null) {
+            final compressedImage = await _compressImage(_selectedImage!);
+            final bytes = await compressedImage.readAsBytes();
+            _imageBase64 = base64Encode(bytes);
+          }
+
+          // Step 3: Save user data to Firestore
+          await _firestore.collection('Users').doc(userCredential.user!.uid).set({
+            'email': _emailController.text.trim(),
+            'createdAt': FieldValue.serverTimestamp(),
+            'pass':_passwordController.text.trim(),
+            'uid': userCredential.user!.uid,
+            if (_imageBase64 != null) 'imageBase64': _imageBase64,
+          });
         }
+
 
         if (!mounted) return;
         _showSnackBar("Login successful!", Colors.green);
@@ -73,7 +108,6 @@ class _AuthScreenState extends State<AuthScreen> {
         // Clear form and switch to login
         setState(() {
           _isLogin = true;
-          _selectedImage = null;
         });
       }
 
@@ -296,4 +330,4 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 }
-///chauhanpankajchabiraj@gmail.com
+// ///chauhanpankajchabiraj@gmail.com
