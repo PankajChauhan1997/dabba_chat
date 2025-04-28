@@ -19,8 +19,9 @@ void main() async {
         // // Add other required options for your platforms
       // ),
     );
-  } catch (e) {
-    debugPrint("Firebase initialization error: $e");
+  } catch (e,stackTrace) {
+    print("Firebase initialization error: $e");
+    print("Firebase initialization error stackTrace: $stackTrace");
   }
 
   runApp(const MyApp());
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
               FirebaseAuth.instance.signOut();
               return const AuthScreen();
             }
-            return const ChatScreen();
+            return SafeArea(child: const ChatScreen());
           }
 
           return const AuthScreen();

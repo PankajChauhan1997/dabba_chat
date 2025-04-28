@@ -15,6 +15,7 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _firebaseAuth = FirebaseAuth.instance;
@@ -82,14 +83,14 @@ class _AuthScreenState extends State<AuthScreen> {
             'createdAt': FieldValue.serverTimestamp(),
             'pass':_passwordController.text.trim(),
             'uid': userCredential.user!.uid,
+            'username':_usernameController.text.trim(),
             if (_imageBase64 != null) 'imageBase64': _imageBase64,
           });
         }
-
-
         if (!mounted) return;
         _showSnackBar("Login successful!", Colors.green);
-      } else {
+      }
+      else {
         // SIGN UP LOGIC
         final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
@@ -255,6 +256,21 @@ class _AuthScreenState extends State<AuthScreen> {
                               const SizedBox(height: 12),
                             ],
                           ),
+                        if (!_isLogin)
+                        TextFormField(
+                          controller: _usernameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Username',
+                          ),
+                          keyboardType: TextInputType.name,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your name.';
+                            }
+                            return null;
+                          },
+                        ),
+
                         TextFormField(
                           controller: _emailController,
                           decoration: const InputDecoration(
